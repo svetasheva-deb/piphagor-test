@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Піфагор у м'ятних тонах</title>
+    <style>
+        /* Фон усієї сторінки */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #d1fae5; /* М'ятний колір фону сторінки */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Вікно тренажеру */
+        .container { 
+            background: #fff9c4; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 450px; 
+            text-align: center;
+            border: 3px solid #10b981; /* Темніша м'ятна рамка */
+        }
+
+        h2 { color: #065f46; margin-top: 0; }
+
+        .problem-area { 
+            margin: 20px 0; 
+            font-size: 19px; 
+            min-height: 140px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            background: #f0fdf4; /* Дуже світлий м'ятний під малюнком */
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        input { 
+            width: 100px; 
+            padding: 12px; 
+            font-size: 20px; 
+            border: 2px solid #10b981; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: #059669; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+
+        button { 
+            padding: 12px 20px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 8px; 
+            color: white; 
+            margin: 5px; 
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .btn-check { background: #10b981; }
+        .btn-check:hover { background: #059669; }
+
+        .btn-next { background: #3b82f6; }
+        .btn-next:hover { background: #2563eb; }
+
+        #feedback { font-weight: bold; margin-top: 10px; height: 25px; }
+        .stats { margin-top: 20px; font-size: 14px; color: #065f46; }
+        
+        svg { border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📐 Геометрія: Піфагор</h2>
+    
+    <div id="problem-area" class="problem-area">
+        </div>
+
+    <input type="number" id="userAnswer" placeholder="?">
+    <br>
+    <button class="btn-check" onclick="check()">Перевірити</button>
+    <button class="btn-next" onclick="nextProblem()">Наступне</button>
+    
+    <div id="feedback"></div>
+    <div class="stats">Правильних відповідей: <span id="score">0</span></div>
+</div>
+
+<script>
+    let currentAns = 0;
+    let score = 0;
+    const triples = [[3,4,5], [6,8,10], [5,12,13], [8,15,17], [9,12,15], [12,16,20], [7,24,25], [20,21,29]];
+
+    function nextProblem() {
+        const area = document.getElementById('problem-area');
+        const feedback = document.getElementById('feedback');
+        const input = document.getElementById('userAnswer');
+        feedback.innerText = "";
+        input.value = "";
+        input.focus();
+
+        const triple = triples[Math.floor(Math.random() * triples.length)];
+        const mode = Math.random() > 0.5 ? 'img' : 'text';
+        const find = Math.floor(Math.random() * 3);
+
+        let a = triple[0], b = triple[1], c = triple[2];
+        let labels = [a, b, c];
+        currentAns = labels[find];
+        labels[find] = "?";
+
+        if (mode === 'img') {
+            area.innerHTML = `
+                <svg width="200" height="120" viewBox="0 0 200 120">
+                    <path d="M 60 20 L 60 100 L 160 100 Z" fill="none" stroke="#065f46" stroke-width="4"/>
+                    <path d="M 60 85 L 75 85 L 75 100" fill="none" stroke="#333" stroke-width="2"/>
+                    <text x="35" y="65" font-size="18" font-weight="bold" fill="#065f46">${labels[0]}</text>
+                    <text x="100" y="118" font-size="18" font-weight="bold" fill="#065f46">${labels[1]}</text>
+                    <text x="120" y="55" font-size="18" font-weight="bold" fill="#2563eb">${labels[2]}</text>
+                </svg>`;
+        } else {
+            const type = Math.random() > 0.5 ? 'triangle' : 'oblique';
+            let taskText = "";
+            if (type === 'triangle') {
+                if (find === 0) taskText = `У прямокутному трикутнику катет <b>b = ${b}</b>, гіпотенуза <b>c = ${c}</b>. <br>Знайдіть <b>катет a</b>.`;
+                else if (find === 1) taskText = `У прямокутному трикутнику катет <b>a = ${a}</b>, гіпотенуза <b>c = ${c}</b>. <br>Знайдіть <b>катет b</b>.`;
+                else taskText = `Катети прямокутного трикутника дорівнюють <b>${a}</b> та <b>${b}</b>. <br>Знайдіть <b>гіпотенузу</b>.`;
+            } else {
+                const names = ["перпендикуляр", "проєкцію", "похилу"];
+                if (find === 0) taskText = `Похила = <b>${c}</b>, її проєкція = <b>${b}</b>. <br>Знайдіть <b>перпендикуляр</b>.`;
+                else if (find === 1) taskText = `Перпендикуляр = <b>${a}</b>, похила = <b>${c}</b>. <br>Знайдіть <b>проєкцію</b>.`;
+                else taskText = `Перпендикуляр = <b>${a}</b>, проєкція = <b>${b}</b>. <br>Знайдіть <b>похилу</b>.`;
+            }
+            area.innerHTML = `<p style="padding: 10px; color: #065f46;">${taskText}</p>`;
+        }
+    }
+
+    function check() {
+        const val = parseInt(document.getElementById('userAnswer').value);
+        const fb = document.getElementById('feedback');
+        if (val === currentAns) {
+            fb.style.color = "#059669";
+            fb.innerText = "Правильно! ✨";
+            score++;
+            document.getElementById('score').innerText = score;
+            setTimeout(nextProblem, 1000);
+        } else {
+            fb.style.color = "#dc2626";
+            fb.innerText = "Помилка. Спробуй ще!";
+        }
+    }
+
+    window.onload = nextProblem;
+</script>
+</body>
+</html>
